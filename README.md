@@ -40,6 +40,8 @@ The application registers its Python actions automatically on first launch. Keep
 
 Choose an operation tab and a model. For speech generation and conversion, select a voice and profile, then adjust the model's settings as needed. **Reset preset** restores the configured values. Expand **Settings** to change the API key or audio normalization preference.
 
+Starting an operation displays a highlighted waiting message and changes the disabled action button to **Generating audio...**, **Converting voice...**, or **Transcribing audio...** before processing begins. The message stays static while REAPER waits; the status shows completion or failure when the request returns.
+
 ### Text to Speech
 
 Enter your text in the editor and generate audio:

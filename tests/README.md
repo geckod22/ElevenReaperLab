@@ -9,7 +9,7 @@
 | `test_session_payloads.py` | Model selections, manual settings, resets, text limits, and API payload construction. |
 | `test_protocol_worker.py` | Lua/Python messages, request identity, action startup, simulated HTTP errors/timeouts, and audio recovery. |
 | `test_cursor_ui.py` | Cursor insertion, output-folder checks, voice search, and log filtering/redaction. |
-| `test_audio_workflows.py` | TTS input rules, generated-item selection, import failures, and normalization state preservation. |
+| `test_audio_workflows.py` | Busy-feedback dispatch gate, TTS input rules, generated-item selection, import failures, and normalization state preservation. |
 
 ## Requirements
 

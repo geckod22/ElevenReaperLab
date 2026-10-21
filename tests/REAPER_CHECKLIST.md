@@ -19,6 +19,8 @@ Use a disposable copy of a project and audio. Record REAPER, ReaImGui, SWS, Pyth
 
 ## Audio workflows, only with separately approved service requests
 
+- [ ] Each operation presents its highlighted waiting message and disabled busy-labelled button before REAPER blocks; after success or failure the status updates and actions become available as appropriate.
+
 - [ ] Selected-item TTS aligns on TTS, saves beside the source, mutes only the source, and leaves only the generated item selected.
 - [ ] TTS without selection inserts on TTS at the captured cursor, saves under the saved project's `ElevenReaperLab_Audio`, selects the generated item, and mutes no unrelated item.
 - [ ] Voice Conversion imports on VOICE_REGEN, aligns with and mutes the source, and selects only the generated result.

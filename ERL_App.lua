@@ -37,6 +37,7 @@ local log_search = ""
 local log_levels = { info = true, warning = true, error = true }
 local operation_order = { "tts", "sts", "stt" }
 local operation_names = { tts = "Text to Speech", sts = "Voice Conversion", stt = "Speech to Text" }
+local processing_labels = { tts = "Generating audio...", sts = "Converting voice...", stt = "Transcribing audio..." }
 
 local api_key = reaper.GetExtState(EXT_STATE_SECTION, "api_key")
 
@@ -51,6 +52,7 @@ local scroll_to_bottom = false
 -- Processing?
 local is_processing = false
 local pending_command = ''
+local pending_feedback_drawn = false
 local active_request = nil
 local active_project = nil
 local operation_status = "Ready"
@@ -246,6 +248,7 @@ local function clear_request()
     end
     is_processing = false
     pending_command = ''
+    pending_feedback_drawn = false
     active_request, active_project = nil, nil
 end
 
@@ -356,7 +359,8 @@ local function queue_worker(filename, operation, message, normalize_result)
     active_request, active_project = request, project
     is_processing = true
     pending_command = command
-    operation_status = "Queued: " .. operation_names[operation]
+    pending_feedback_drawn = false
+    operation_status = processing_labels[operation]
     AddLog(message .. " [" .. request.request_id .. "]")
 end
 
@@ -688,7 +692,9 @@ local function draw_operation_action(operation, input)
         stt = { "Transcribe audio", "erl_speech_to_text.py", "Starting Speech to Text...", false }
     }
     local action = actions[operation]
-    if reaper.ImGui_Button(ctx, action[1], -1, 36) then
+    local label = is_processing and active_request and active_request.operation == operation
+        and processing_labels[operation] or action[1]
+    if reaper.ImGui_Button(ctx, label .. "##operation_action", -1, 36) then
         queue_worker(action[2], operation, action[3], action[4])
     end
     reaper.ImGui_EndDisabled(ctx)
@@ -746,15 +752,16 @@ local function draw_logs()
 end
 
 local function dispatch_pending()
-    if pending_command == '' then return end
+    -- Yield until a complete busy-state frame has been drawn and presented.
+    if pending_command == '' or not pending_feedback_drawn then return end
     local command = pending_command
     pending_command = ''
+    pending_feedback_drawn = false
     if not active_project or not reaper.ValidatePtr(active_project, "ReaProject*")
         or reaper.EnumProjects(-1) ~= active_project then
         fail_active("PROJECT_CHANGED", "The original project is no longer active.")
         return
     end
-    operation_status = "Processing (synchronous)"
     local dispatched = pcall(reaper.Main_OnCommand, command, 0)
     HandleScriptMessages()
     if is_processing then
@@ -769,8 +776,15 @@ local function loop()
     reaper.ImGui_SetNextWindowSize(ctx, 620, 820, reaper.ImGui_Cond_FirstUseEver())
     local visible, open = reaper.ImGui_Begin(ctx, 'Eleven Reaper Lab v1', true, 0)
     if visible then
+        local showing_processing = is_processing and active_request ~= nil
         reaper.ImGui_Text(ctx, "Eleven Reaper Lab")
         reaper.ImGui_TextWrapped(ctx, "Status: " .. operation_status)
+        if showing_processing then
+            reaper.ImGui_Separator(ctx)
+            reaper.ImGui_TextColored(ctx, 0xFFCC66FF, processing_labels[active_request.operation])
+            reaper.ImGui_TextWrapped(ctx, "Please wait. REAPER is temporarily blocked while the request is processed.")
+            reaper.ImGui_Separator(ctx)
+        end
         reaper.ImGui_TextWrapped(ctx, "REAPER waits during requests. Network timeouts: 10 s connection / 300 s read inactivity.")
         draw_settings()
         draw_configuration_error()
@@ -790,6 +804,9 @@ local function loop()
         reaper.ImGui_Separator(ctx)
         draw_logs()
         reaper.ImGui_End(ctx)
+        -- The next deferred iteration may start the synchronous worker.
+        -- A click occurs below the status area, so its own frame is not enough.
+        if showing_processing and pending_command ~= '' then pending_feedback_drawn = true end
     end
     if open then reaper.defer(loop) end
 end

@@ -27,6 +27,46 @@ def app_function(lua, name, bindings):
 
 
 class AudioWorkflowTests(fixtures.ProtocolWorkerTests):
+    def test_dispatch_waits_for_busy_feedback_and_consumes_command_once(self):
+        state = {"calls": [], "errors": []}
+        globals_table = self.lua.globals()
+
+        def complete():
+            globals_table.is_processing = False
+
+        def fail(code, message):
+            state["errors"].append(code)
+            globals_table.is_processing = False
+
+        reaper = self.lua.table_from({
+            "ValidatePtr": lambda *args: True,
+            "EnumProjects": lambda index: "project",
+            "Main_OnCommand": lambda command, flags: state["calls"].append(command),
+        })
+        dispatch = app_function(self.lua, "dispatch_pending", {
+            "reaper": reaper, "pending_command": 123,
+            "pending_feedback_drawn": False, "active_project": "project",
+            "is_processing": True, "HandleScriptMessages": complete, "fail_active": fail,
+        })
+        dispatch()
+        self.assertEqual(state["calls"], [])
+        self.assertEqual(globals_table.pending_command, 123)
+        globals_table.pending_feedback_drawn = True
+        dispatch()
+        dispatch()
+        self.assertEqual(state["calls"], [123])
+        self.assertEqual(state["errors"], [])
+        self.assertEqual(globals_table.pending_command, "")
+        self.assertIs(globals_table.pending_feedback_drawn, False)
+
+        globals_table.pending_command = 456
+        globals_table.pending_feedback_drawn = True
+        globals_table.is_processing = True
+        globals_table.active_project = "different-project"
+        dispatch()
+        self.assertEqual(state["calls"], [123])
+        self.assertEqual(state["errors"], ["PROJECT_CHANGED"])
+
     def input_fixture(self, count=1, duration=4, offset=0, source_length=4,
                       project_file="/fixture/project.rpp", midi=False):
         state = {"duration": duration, "offset": offset, "source_length": source_length}
