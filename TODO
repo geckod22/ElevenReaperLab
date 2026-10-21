@@ -1,0 +1,20 @@
+# TODO
+
+Potential improvements for future releases. These items are not implemented or scheduled.
+
+## Model catalog refresh
+
+- [ ] Add an explicit action to fetch model information from ElevenLabs and update the local catalog used by the model selectors.
+
+### Expected behavior
+
+Fetch and validate model metadata, then persist usable results locally. Keep the last valid catalog available if the request or validation fails. Preserve personal voices, profiles, and model defaults in `erl_config.json`.
+
+API metadata may not describe every supported parameter or request format. Preserve the application's compatibility rules and enable newly discovered models only when their controls, settings validation, and request handling are supported. Do not treat a model appearing in an API response as proof that the current account can use it.
+
+### Decisions before implementation
+
+- Check official documentation for discovery support across Text to Speech, Voice Conversion, and file transcription.
+- Decide whether to update `erl_models.json` or store discovered metadata in a separate local cache.
+- Define how API metadata is combined with local compatibility rules and how incomplete or unavailable entries appear in the interface.
+- Agree on the implementation plan before development.

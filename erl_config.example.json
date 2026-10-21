@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "voices": [
+    {
+      "id": "wise_man_2",
+      "name": "Vecchio Saggio 2",
+      "voice_id": "55yFBZr9Z5qIEPStrml6"
+    },
+    {
+      "id": "wise_man_3",
+      "name": "Vecchio Saggio 3",
+      "voice_id": "DvhZbRTZ1tLwH9fmUXy3"
+    },
+    {
+      "id": "wise_woman",
+      "name": "Vecchia Saggia",
+      "voice_id": "JMMRfSOPHFZtKfqJOA3h"
+    },
+    {
+      "id": "curious_girl",
+      "name": "Ragazza Curiosa",
+      "voice_id": "hNh5DDgWzileCY9sKkLU"
+    }
+  ],
+  "model_defaults": {
+    "tts": {
+      "eleven_multilingual_v2": {
+        "speed": 1.0,
+        "stability": 0.5,
+        "similarity_boost": 0.75
+      },
+      "eleven_v3": {
+        "stability": 0.5
+      },
+      "eleven_v4": {
+        "stability": 0.5,
+        "similarity_boost": 0.75
+      },
+      "eleven_v4_turbo": {
+        "stability": 0.5,
+        "similarity_boost": 0.75
+      },
+      "eleven_flash_v2_5": {
+        "speed": 1.0,
+        "stability": 0.5,
+        "similarity_boost": 0.75
+      }
+    },
+    "sts": {
+      "eleven_multilingual_sts_v2": {
+        "speed": 1.0,
+        "stability": 0.5,
+        "similarity_boost": 0.75
+      },
+      "eleven_english_sts_v2": {
+        "speed": 1.0,
+        "stability": 0.5,
+        "similarity_boost": 0.75
+      }
+    },
+    "stt": {
+      "scribe_v2": {},
+      "scribe_v1": {}
+    }
+  },
+  "profiles": [
+    {
+      "id": "bedtime",
+      "name": "Bedtime",
+      "settings": {
+        "tts": {
+          "eleven_multilingual_v2": {
+            "speed": 0.91,
+            "stability": 0.85,
+            "similarity_boost": 0.8
+          }
+        },
+        "sts": {
+          "eleven_multilingual_sts_v2": {
+            "speed": 0.91,
+            "stability": 0.85,
+            "similarity_boost": 0.8
+          }
+        }
+      },
+      "voice_overrides": {
+        "wise_man_3": {
+          "tts": {
+            "eleven_multilingual_v2": {
+              "speed": 1.08,
+              "stability": 0.7,
+              "similarity_boost": 0.75
+            }
+          },
+          "sts": {
+            "eleven_multilingual_sts_v2": {
+              "speed": 1.08,
+              "stability": 0.7,
+              "similarity_boost": 0.75
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "meditation",
+      "name": "Meditation",
+      "settings": {
+        "tts": {
+          "eleven_multilingual_v2": {
+            "speed": 0.9,
+            "stability": 0.85,
+            "similarity_boost": 0.8
+          }
+        },
+        "sts": {
+          "eleven_multilingual_sts_v2": {
+            "speed": 0.9,
+            "stability": 0.85,
+            "similarity_boost": 0.8
+          }
+        }
+      },
+      "voice_overrides": {
+        "wise_man_3": {
+          "tts": {
+            "eleven_multilingual_v2": {
+              "speed": 1.0,
+              "stability": 0.85,
+              "similarity_boost": 0.8
+            }
+          },
+          "sts": {
+            "eleven_multilingual_sts_v2": {
+              "speed": 1.0,
+              "stability": 0.85,
+              "similarity_boost": 0.8
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "course",
+      "name": "Course",
+      "settings": {
+        "tts": {
+          "eleven_multilingual_v2": {
+            "speed": 0.97,
+            "stability": 0.8,
+            "similarity_boost": 0.75
+          }
+        },
+        "sts": {
+          "eleven_multilingual_sts_v2": {
+            "speed": 0.97,
+            "stability": 0.8,
+            "similarity_boost": 0.75
+          }
+        }
+      },
+      "voice_overrides": {
+        "wise_man_3": {
+          "tts": {
+            "eleven_multilingual_v2": {
+              "speed": 1.1,
+              "stability": 0.8,
+              "similarity_boost": 0.75
+            }
+          },
+          "sts": {
+            "eleven_multilingual_sts_v2": {
+              "speed": 1.1,
+              "stability": 0.8,
+              "similarity_boost": 0.75
+            }
+          }
+        }
+      }
+    }
+  ],
+  "preferences": {
+    "normalize_audio": true
+  }
+}

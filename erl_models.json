@@ -1,0 +1,659 @@
+{
+  "registry_version": 1,
+  "reviewed_on": "2026-10-16",
+  "sources": {
+    "models": "https://elevenlabs.io/docs/overview/models",
+    "model_list": "https://elevenlabs.io/docs/api-reference/models/list",
+    "tts": "https://elevenlabs.io/docs/api-reference/text-to-speech/convert",
+    "tts_guide": "https://elevenlabs.io/docs/eleven-creative/playground/text-to-speech",
+    "voice_settings": "https://elevenlabs.io/docs/api-reference/voices/settings/update",
+    "rest_settings": "https://github.com/elevenlabs/skills/blob/main/text-to-speech/references/voice-settings.md",
+    "sts": "https://elevenlabs.io/docs/api-reference/speech-to-speech/convert",
+    "sts_settings": "https://github.com/elevenlabs/skills/blob/main/voice-changer/SKILL.md",
+    "stt": "https://elevenlabs.io/docs/api-reference/speech-to-text/convert"
+  },
+  "notes": [
+    "Local capability catalog, not proof of account access or an exhaustive ElevenLabs API schema.",
+    "Suggested defaults are metadata only; they are never automatically merged into user settings.",
+    "Use model-specific documentation over generic guidance where they disagree.",
+    "REST speed limits use the official REST settings reference; the GUI range is kept separately.",
+    "Model selection and worker payloads use this catalog; account availability remains unverified."
+  ],
+  "runtime_defaults": {
+    "tts": "eleven_multilingual_v2",
+    "sts": "eleven_multilingual_sts_v2",
+    "stt": "scribe_v2"
+  },
+  "legacy_worker_parameters": {
+    "tts": [
+      "speed",
+      "stability",
+      "similarity_boost"
+    ],
+    "sts": [
+      "speed",
+      "stability",
+      "similarity_boost"
+    ],
+    "stt": []
+  },
+  "parameters": {
+    "speed": {
+      "label": "Speed",
+      "type": "number",
+      "api_field": "speed",
+      "destination": "voice_settings",
+      "api_required": false,
+      "minimum": 0.25,
+      "maximum": 4,
+      "suggested_default": 1,
+      "description": "Speech rate multiplier.",
+      "ui": {
+        "control": "slider",
+        "step": 0.01,
+        "minimum": 0.5,
+        "maximum": 2
+      },
+      "source_refs": [
+        "rest_settings"
+      ]
+    },
+    "stability": {
+      "label": "Stability",
+      "type": "number",
+      "api_field": "stability",
+      "destination": "voice_settings",
+      "api_required": false,
+      "minimum": 0,
+      "maximum": 1,
+      "suggested_default": 0.5,
+      "description": "Balance between variation and consistent delivery.",
+      "ui": {
+        "control": "slider",
+        "step": 0.01
+      },
+      "source_refs": [
+        "voice_settings"
+      ]
+    },
+    "similarity_boost": {
+      "label": "Similarity",
+      "type": "number",
+      "api_field": "similarity_boost",
+      "destination": "voice_settings",
+      "api_required": false,
+      "minimum": 0,
+      "maximum": 1,
+      "suggested_default": 0.75,
+      "description": "Resemblance to the reference voice.",
+      "ui": {
+        "control": "slider",
+        "step": 0.01
+      },
+      "source_refs": [
+        "voice_settings"
+      ]
+    },
+    "style": {
+      "label": "Style",
+      "type": "number",
+      "api_field": "style",
+      "destination": "voice_settings",
+      "api_required": false,
+      "minimum": 0,
+      "maximum": 1,
+      "suggested_default": 0,
+      "description": "Emphasis on the reference voice's delivery.",
+      "ui": {
+        "control": "slider",
+        "step": 0.01
+      },
+      "source_refs": [
+        "rest_settings"
+      ]
+    },
+    "use_speaker_boost": {
+      "label": "Speaker boost",
+      "type": "boolean",
+      "api_field": "use_speaker_boost",
+      "destination": "voice_settings",
+      "api_required": false,
+      "suggested_default": true,
+      "description": "Additional processing for voice resemblance.",
+      "ui": {
+        "control": "checkbox"
+      },
+      "source_refs": [
+        "voice_settings"
+      ]
+    },
+    "seed": {
+      "label": "Seed",
+      "type": "integer",
+      "api_field": "seed",
+      "destination": "request",
+      "api_required": false,
+      "minimum": 0,
+      "maximum": 4294967295,
+      "suggested_default": 0,
+      "description": "Best-effort reproducibility; no deterministic guarantee.",
+      "ui": {
+        "control": "integer"
+      },
+      "source_refs": [
+        "tts",
+        "sts"
+      ]
+    },
+    "remove_background_noise": {
+      "label": "Remove background noise",
+      "type": "boolean",
+      "api_field": "remove_background_noise",
+      "destination": "request",
+      "api_required": false,
+      "suggested_default": false,
+      "description": "Request input noise isolation.",
+      "ui": {
+        "control": "checkbox"
+      },
+      "source_refs": [
+        "sts"
+      ]
+    },
+    "language_code": {
+      "label": "Language",
+      "type": "string",
+      "api_field": "language_code",
+      "destination": "request",
+      "api_required": false,
+      "min_length": 2,
+      "max_length": 3,
+      "description": "ISO 639-1 or ISO 639-3 language code; omit for automatic detection.",
+      "ui": {
+        "control": "text"
+      },
+      "source_refs": [
+        "stt"
+      ]
+    },
+    "tag_audio_events": {
+      "label": "Tag audio events",
+      "type": "boolean",
+      "api_field": "tag_audio_events",
+      "destination": "request",
+      "api_required": false,
+      "suggested_default": true,
+      "description": "Include non-speech audio event annotations.",
+      "ui": {
+        "control": "checkbox"
+      },
+      "source_refs": [
+        "stt"
+      ]
+    },
+    "diarize": {
+      "label": "Identify speakers",
+      "type": "boolean",
+      "api_field": "diarize",
+      "destination": "request",
+      "api_required": false,
+      "suggested_default": false,
+      "description": "Annotate speaker changes in the transcript.",
+      "ui": {
+        "control": "checkbox"
+      },
+      "source_refs": [
+        "stt"
+      ]
+    },
+    "num_speakers": {
+      "label": "Number of speakers",
+      "type": "integer",
+      "api_field": "num_speakers",
+      "destination": "request",
+      "api_required": false,
+      "minimum": 1,
+      "maximum": 32,
+      "suggested_default": 2,
+      "description": "Maximum expected speaker count.",
+      "ui": {
+        "control": "integer"
+      },
+      "source_refs": [
+        "stt"
+      ]
+    },
+    "timestamps_granularity": {
+      "label": "Timestamp detail",
+      "type": "string",
+      "api_field": "timestamps_granularity",
+      "destination": "request",
+      "api_required": false,
+      "enum": [
+        "none",
+        "word",
+        "character"
+      ],
+      "suggested_default": "word",
+      "description": "Transcript timing detail.",
+      "ui": {
+        "control": "select",
+        "labels": [
+          "None",
+          "Words",
+          "Characters"
+        ]
+      },
+      "source_refs": [
+        "stt"
+      ]
+    },
+    "temperature": {
+      "label": "Temperature",
+      "type": "number",
+      "api_field": "temperature",
+      "destination": "request",
+      "api_required": false,
+      "minimum": 0,
+      "maximum": 2,
+      "suggested_default": 0,
+      "description": "Transcription sampling variation.",
+      "ui": {
+        "control": "slider",
+        "step": 0.01
+      },
+      "source_refs": [
+        "stt"
+      ]
+    },
+    "diarization_threshold": {
+      "label": "Speaker separation threshold",
+      "type": "number",
+      "api_field": "diarization_threshold",
+      "destination": "request",
+      "api_required": false,
+      "minimum": 0.1,
+      "maximum": 0.4,
+      "suggested_default": 0.22,
+      "description": "Optional speaker separation sensitivity; requires diarization and no explicit speaker count.",
+      "ui": {
+        "control": "slider",
+        "step": 0.01
+      },
+      "source_refs": [
+        "stt"
+      ]
+    },
+    "no_verbatim": {
+      "label": "Remove filler words",
+      "type": "boolean",
+      "api_field": "no_verbatim",
+      "destination": "request",
+      "api_required": false,
+      "suggested_default": false,
+      "description": "Omit fillers, false starts and non-speech sounds; Scribe v2 only.",
+      "ui": {
+        "control": "checkbox"
+      },
+      "source_refs": [
+        "stt"
+      ]
+    }
+  },
+  "models": [
+    {
+      "id": "eleven_multilingual_v2",
+      "name": "Eleven Multilingual v2",
+      "reviewed_on": "2026-10-15",
+      "source_refs": [
+        "models",
+        "tts",
+        "tts_guide",
+        "rest_settings"
+      ],
+      "notes": [],
+      "operations": {
+        "tts": {
+          "input_kind": "text",
+          "transport": "json",
+          "endpoint": "/v1/text-to-speech/{voice_id}",
+          "parameters": {
+            "speed": {},
+            "stability": {},
+            "similarity_boost": {},
+            "style": {},
+            "use_speaker_boost": {},
+            "seed": {}
+          },
+          "required_settings": [
+            "speed",
+            "stability",
+            "similarity_boost"
+          ],
+          "constraints": [],
+          "limits": {
+            "max_text_characters": 10000
+          }
+        }
+      }
+    },
+    {
+      "id": "eleven_v3",
+      "name": "Eleven v3",
+      "reviewed_on": "2026-10-16",
+      "selection_enabled": true,
+      "selection_note": "WARNING: Eleven v3 Stability values 0 / 0.5 / 1 have not been verified through the API. Compatibility is unverified.",
+      "source_refs": [
+        "models",
+        "tts",
+        "tts_guide",
+        "rest_settings"
+      ],
+      "notes": [
+        "The model-specific product guide excludes speed, similarity and speaker boost. The general official settings reference lists style for v3.",
+        "The registered stability choices 0, 0.5 and 1 are a provisional application policy. The user approved enabling selection with a compatibility warning; numeric mode mapping still requires separately authorized API verification."
+      ],
+      "operations": {
+        "tts": {
+          "input_kind": "text",
+          "transport": "json",
+          "endpoint": "/v1/text-to-speech/{voice_id}",
+          "parameters": {
+            "stability": {
+              "enum": [
+                0,
+                0.5,
+                1
+              ],
+              "ui": {
+                "control": "select",
+                "labels": [
+                  "Creative",
+                  "Natural",
+                  "Robust"
+                ]
+              }
+            },
+            "style": {},
+            "seed": {}
+          },
+          "required_settings": [
+            "stability"
+          ],
+          "constraints": [],
+          "limits": {
+            "max_text_characters": 5000
+          }
+        }
+      }
+    },
+    {
+      "id": "eleven_v4",
+      "name": "Eleven v4",
+      "reviewed_on": "2026-10-15",
+      "source_refs": [
+        "models",
+        "tts",
+        "tts_guide"
+      ],
+      "notes": [],
+      "operations": {
+        "tts": {
+          "input_kind": "text",
+          "transport": "json",
+          "endpoint": "/v1/text-to-speech/{voice_id}",
+          "parameters": {
+            "stability": {},
+            "similarity_boost": {},
+            "seed": {}
+          },
+          "required_settings": [
+            "stability",
+            "similarity_boost"
+          ],
+          "constraints": [],
+          "limits": {
+            "max_text_characters": 10000
+          }
+        }
+      }
+    },
+    {
+      "id": "eleven_v4_turbo",
+      "name": "Eleven v4 Turbo",
+      "reviewed_on": "2026-10-15",
+      "source_refs": [
+        "models",
+        "tts",
+        "tts_guide"
+      ],
+      "notes": [
+        "No unverified text-length limit is assumed."
+      ],
+      "operations": {
+        "tts": {
+          "input_kind": "text",
+          "transport": "json",
+          "endpoint": "/v1/text-to-speech/{voice_id}",
+          "parameters": {
+            "stability": {},
+            "similarity_boost": {},
+            "seed": {}
+          },
+          "required_settings": [
+            "stability",
+            "similarity_boost"
+          ],
+          "constraints": []
+        }
+      }
+    },
+    {
+      "id": "eleven_flash_v2_5",
+      "name": "Eleven Flash v2.5",
+      "reviewed_on": "2026-10-15",
+      "source_refs": [
+        "models",
+        "tts",
+        "rest_settings"
+      ],
+      "notes": [
+        "Registered subset only. Style and speaker boost are not enabled without model-specific confirmation."
+      ],
+      "operations": {
+        "tts": {
+          "input_kind": "text",
+          "transport": "json",
+          "endpoint": "/v1/text-to-speech/{voice_id}",
+          "parameters": {
+            "speed": {},
+            "stability": {},
+            "similarity_boost": {},
+            "seed": {}
+          },
+          "required_settings": [
+            "speed",
+            "stability",
+            "similarity_boost"
+          ],
+          "constraints": [],
+          "limits": {
+            "max_text_characters": 40000
+          }
+        }
+      }
+    },
+    {
+      "id": "eleven_multilingual_sts_v2",
+      "name": "Eleven Multilingual STS v2",
+      "reviewed_on": "2026-10-15",
+      "source_refs": [
+        "models",
+        "sts",
+        "sts_settings",
+        "rest_settings"
+      ],
+      "notes": [],
+      "operations": {
+        "sts": {
+          "input_kind": "audio_file",
+          "transport": "multipart",
+          "endpoint": "/v1/speech-to-speech/{voice_id}",
+          "parameters": {
+            "speed": {},
+            "stability": {},
+            "similarity_boost": {},
+            "style": {},
+            "use_speaker_boost": {},
+            "seed": {},
+            "remove_background_noise": {}
+          },
+          "required_settings": [
+            "speed",
+            "stability",
+            "similarity_boost"
+          ],
+          "constraints": []
+        }
+      }
+    },
+    {
+      "id": "eleven_english_sts_v2",
+      "name": "Eleven English STS v2",
+      "reviewed_on": "2026-10-15",
+      "source_refs": [
+        "models",
+        "sts",
+        "sts_settings",
+        "rest_settings"
+      ],
+      "notes": [],
+      "operations": {
+        "sts": {
+          "input_kind": "audio_file",
+          "transport": "multipart",
+          "endpoint": "/v1/speech-to-speech/{voice_id}",
+          "parameters": {
+            "speed": {},
+            "stability": {},
+            "similarity_boost": {},
+            "style": {},
+            "use_speaker_boost": {},
+            "seed": {},
+            "remove_background_noise": {}
+          },
+          "required_settings": [
+            "speed",
+            "stability",
+            "similarity_boost"
+          ],
+          "constraints": []
+        }
+      }
+    },
+    {
+      "id": "scribe_v2",
+      "name": "Scribe v2",
+      "reviewed_on": "2026-10-15",
+      "source_refs": [
+        "models",
+        "stt"
+      ],
+      "notes": [],
+      "operations": {
+        "stt": {
+          "input_kind": "audio_file",
+          "transport": "multipart",
+          "endpoint": "/v1/speech-to-text",
+          "parameters": {
+            "language_code": {},
+            "tag_audio_events": {},
+            "diarize": {},
+            "num_speakers": {},
+            "timestamps_granularity": {},
+            "temperature": {},
+            "seed": {
+              "maximum": 2147483647
+            },
+            "diarization_threshold": {},
+            "no_verbatim": {}
+          },
+          "required_settings": [],
+          "constraints": [
+            {
+              "setting": "diarization_threshold",
+              "requires": {
+                "diarize": true
+              },
+              "conflicts": [
+                "num_speakers"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "scribe_v1",
+      "name": "Scribe v1",
+      "reviewed_on": "2026-10-15",
+      "source_refs": [
+        "models",
+        "stt"
+      ],
+      "notes": [],
+      "operations": {
+        "stt": {
+          "input_kind": "audio_file",
+          "transport": "multipart",
+          "endpoint": "/v1/speech-to-text",
+          "parameters": {
+            "language_code": {},
+            "tag_audio_events": {},
+            "diarize": {},
+            "num_speakers": {},
+            "timestamps_granularity": {},
+            "temperature": {},
+            "seed": {
+              "maximum": 2147483647
+            },
+            "diarization_threshold": {}
+          },
+          "required_settings": [],
+          "constraints": [
+            {
+              "setting": "diarization_threshold",
+              "requires": {
+                "diarize": true
+              },
+              "conflicts": [
+                "num_speakers"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "scribe_v2_realtime",
+      "name": "Scribe v2 Realtime",
+      "reviewed_on": "2026-10-15",
+      "source_refs": [
+        "models"
+      ],
+      "notes": [
+        "Recognized for input-kind filtering only; realtime controls and transport integration are not implemented."
+      ],
+      "operations": {
+        "stt": {
+          "input_kind": "audio_stream",
+          "transport": "websocket",
+          "endpoint": "/v1/speech-to-text/realtime",
+          "parameters": {},
+          "required_settings": [],
+          "constraints": []
+        }
+      }
+    }
+  ]
+}
