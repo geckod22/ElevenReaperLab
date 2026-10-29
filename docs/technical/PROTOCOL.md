@@ -47,6 +47,8 @@ Every response includes version, request ID, operation, `status`, and a `logs` a
 
 Fields are omitted when inapplicable; JSON null is not used. Unicode, newlines, and literal `|` characters remain data rather than message delimiters. Full input text, API keys, raw HTTP bodies, and exception strings are excluded from ordinary logs.
 
+After a successful TTS HTTP response, the worker reads the optional `character-cost` response header and records a nonnegative integer or decimal value as `Text to Speech credits used: N.` in the existing log array. Missing or invalid metadata produces `Text to Speech credit usage unavailable.` without failing generation. No text-length estimate, account-balance comparison, history lookup, or additional API request is used. Billing is logged before audio saving/import, so a later local failure does not hide the reported charge. HTTP failures and timeouts do not imply zero cost. STS/STT do not emit billing entries. See ElevenLabs' [generation-cost documentation](https://elevenlabs.io/docs/api-reference/introduction/).
+
 Error codes distinguish invalid requests/settings, unsupported protocol versions, operation mismatch, missing authentication/dependencies/source, changed project/source, HTTP authentication/access/model/validation/limit failures, network timeout/error, invalid service response, import failure, bootstrap failure, missing terminal response, and local interruption.
 
 ## Timeout and uncertain outcomes

@@ -212,6 +212,49 @@ class ProtocolWorkerTests(unittest.TestCase):
             self.assertIs(result["error"]["outcome_uncertain"], True)
             self.assertEqual(len(calls), 1)
 
+    def test_tts_credit_usage_logs_provider_value_without_estimates(self):
+        for cost in ("125", "0", "62.5", " 12.5 "):
+            with self.subTest(cost=cost):
+                response = types.SimpleNamespace(status_code=200,
+                    headers={"Content-Type": "audio/mpeg", "character-cost": cost},
+                    content=b"simulated-audio", close=lambda: None)
+                result, calls = self.run_simulated(self.request("tts"), response)
+                self.assertEqual(result["status"], "completed")
+                messages = [entry["message"] for entry in result["logs"]]
+                self.assertIn("Text to Speech credits used: " + cost.strip() + ".", messages)
+                self.assertEqual(len(calls), 1)
+
+    def test_tts_missing_or_invalid_credit_usage_does_not_fail_generation(self):
+        for cost in (None, "", "NaN", "Infinity", "-1", "true", "12\nprivate-header", "1" * 65):
+            with self.subTest(cost=cost):
+                response = types.SimpleNamespace(status_code=200,
+                    headers={"Content-Type": "audio/mpeg"}, content=b"simulated-audio", close=lambda: None)
+                if cost is not None:
+                    response.headers["character-cost"] = cost
+                result, calls = self.run_simulated(self.request("tts"), response)
+                self.assertEqual(result["status"], "completed")
+                messages = [entry["message"] for entry in result["logs"]]
+                self.assertIn("Text to Speech credit usage unavailable.", messages)
+                self.assertFalse(any("credits used:" in message for message in messages))
+                self.assertNotIn("private-header", json.dumps(result))
+                self.assertEqual(len(calls), 1)
+
+    def test_tts_credit_usage_survives_import_failure_without_affecting_sts_stt(self):
+        response = types.SimpleNamespace(status_code=200,
+            headers={"Content-Type": "audio/mpeg", "character-cost": "25"},
+            content=b"simulated-audio", close=lambda: None,
+            json=lambda: {"text": "Transcribed fixture"})
+        result, calls = self.run_simulated(self.request("tts"), response, import_failure=True)
+        self.assertEqual(result["error"]["code"], "IMPORT_FAILED")
+        self.assertIn("Text to Speech credits used: 25.", [entry["message"] for entry in result["logs"]])
+        self.assertEqual(len(calls), 1)
+        for operation in ("sts", "stt"):
+            with self.subTest(operation=operation):
+                result, calls = self.run_simulated(self.request(operation), response)
+                self.assertEqual(result["status"], "completed")
+                self.assertFalse(any("credit" in entry["message"].lower() for entry in result["logs"]))
+                self.assertEqual(len(calls), 1)
+
     def test_http_failure_and_audio_recovery(self):
         for status, expected in ((401, "AUTHENTICATION_FAILED"), (429, "SERVICE_LIMIT"), (503, "HTTP_ERROR")):
             response = types.SimpleNamespace(status_code=status, close=lambda: None)

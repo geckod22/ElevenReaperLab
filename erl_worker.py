@@ -2,6 +2,7 @@
 
 import mimetypes
 import os
+import re
 import uuid
 
 from erl_protocol import (WorkerError, decode_json, terminal_response, validate_request)
@@ -169,6 +170,14 @@ def perform_request(reaper, request, catalog, api_key, logs, state):
                     422: "SERVICE_VALIDATION_FAILED", 429: "SERVICE_LIMIT"}.get(status, "HTTP_ERROR")
             raise WorkerError(code, "ElevenLabs returned HTTP " + str(status) + ". No automatic retry was made.",
                               status >= 500, http_status=status)
+        if operation == "tts":
+            # Billing metadata belongs to the service request, even if import later fails.
+            credit_cost = response.headers.get("character-cost")
+            if (isinstance(credit_cost, str) and len(credit_cost) <= 64
+                    and re.fullmatch(r"[0-9]+(?:\.[0-9]+)?", credit_cost.strip())):
+                logs.append({"level": "info", "message": "Text to Speech credits used: " + credit_cost.strip() + "."})
+            else:
+                logs.append({"level": "info", "message": "Text to Speech credit usage unavailable."})
         if operation == "stt":
             try:
                 data = response.json()

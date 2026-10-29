@@ -7,7 +7,7 @@
 | `run_regression.py` | Runs the suite, blocks network connections, selects the Lua runtime, and avoids repeating inherited tests. |
 | `test_registry_configuration.py` | Configuration validation, preset precedence, model catalog, Lua/Python parity, and source syntax. |
 | `test_session_payloads.py` | Model selections, manual settings, resets, text limits, and API payload construction. |
-| `test_protocol_worker.py` | Lua/Python messages, request identity, action startup, simulated HTTP errors/timeouts, and audio recovery. |
+| `test_protocol_worker.py` | Lua/Python messages, request identity, action startup, TTS credit metadata, simulated HTTP errors/timeouts, and audio recovery. |
 | `test_cursor_ui.py` | Cursor insertion, output-folder checks, voice search, and log filtering/redaction. |
 | `test_audio_workflows.py` | Busy-feedback dispatch gate, TTS input rules, generated-item selection, import failures, and normalization state preservation. |
 

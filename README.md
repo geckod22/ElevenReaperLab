@@ -65,6 +65,8 @@ Select one audio item and use **Speech to Text** to transcribe it. After a succe
 
 The **Activity log** shows operation results and errors. Expand it to filter, copy, or clear entries. You can also assign a keyboard shortcut to the application in REAPER's Action List.
 
+For Text to Speech, the log also shows the credits used when ElevenLabs returns billing metadata. Otherwise it reports that credit usage is unavailable; it does not estimate a charge. This reporting adds no API requests and does not apply to Voice Conversion or Speech to Text.
+
 ## Configuration and profiles
 
 `erl_config.example.json` is the distributed template; `erl_config.json` is your personal configuration. Create the latter by copying the example, then edit it to manage voices, model defaults, usage profiles, and the default normalization preference. The example profiles are **Bedtime**, **Meditation**, and **Course**. Keep your API key in the application's **Settings**, outside the JSON file.
